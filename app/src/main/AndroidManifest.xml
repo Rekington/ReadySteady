@@ -4,13 +4,13 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ReadySteady">
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,6 +18,55 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activities.RideEndActivity"
+            android:exported="true"
+            android:label="Driver" />
+
+        <activity
+            android:name=".activities.DriverActivity"
+            android:exported="true"
+            android:label="Driving" />
+        
+        <activity
+            android:name=".activities.LoadingActivity"
+            android:exported="true"
+            android:label="Loading" />
+
+        <activity
+            android:name=".activities.LoginActivity"
+            android:exported="true"
+            android:label="Login" />
+
+        <activity
+            android:name=".activities.RatingActivity"
+            android:exported="true"
+            android:label="Rating" />
+
+        <activity
+            android:name=".activities.RequestActivity"
+            android:exported="true"
+            android:label="Request" />
+
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:exported="true"
+            android:label="Settings" />
+
+        <activity
+            android:name=".activities.SignupActivity"
+            android:exported="true"
+            android:label="Sign-up" />
+
+
+        <activity
+            android:name=".activities.WaitingActivity"
+            android:exported="true"
+            android:label="Waiting" />
+
+
+
     </application>
 
 </manifest>

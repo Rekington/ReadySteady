@@ -1,10 +1,12 @@
-package com.example.readysteady;
+package com.example.readysteady.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.example.readysteady.R;
 
 public class WaitingActivity extends AppCompatActivity {
 

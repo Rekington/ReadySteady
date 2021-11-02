@@ -18,7 +18,7 @@
         app:layout_constraintVertical_bias="0.195" />
 
     <EditText
-        android:id="@+id/editTextTextEmailAddress"
+        android:id="@+id/loginEmailAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -44,7 +44,7 @@
         app:layout_constraintVertical_bias="0.543" />
 
     <EditText
-        android:id="@+id/editTextTextPassword"
+        android:id="@+id/loginPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="40dp"
@@ -70,7 +70,7 @@
 
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sign-in"
@@ -82,7 +82,7 @@
         app:layout_constraintVertical_bias="0.774" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/loginCanelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cancel"
@@ -94,7 +94,7 @@
         app:layout_constraintVertical_bias="0.774" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/loginForgotUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Forgot Username or Password"
