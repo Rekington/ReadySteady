@@ -2,6 +2,7 @@ package com.example.readysteady.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -26,22 +27,13 @@ public class LoginActivity extends AppCompatActivity {
         String role = getIntent().getStringExtra("role");
         loginButton.setOnClickListener(view -> {
 
-            Intent login;
-            if (role.equals("driver")) {
-                if (!email.getText().toString().equals("driver@gmail.com")){
-                    Toast.makeText(getApplicationContext(),"You username and password is not registered. Please register yourself", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                login = new Intent(getApplicationContext(), MapDriverActivity.class);
-            } else {
-                if (!email.getText().toString().equals("rider@gmail.com")){
-                    Toast.makeText(getApplicationContext(),"You username and password is not registered. Please register yourself", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                login = new Intent(getApplicationContext(), MapRiderActivity.class);
-            }
-            login.putExtra("loginUser", new LoginModel(email.getText().toString(), password.getText().toString(), role));
-            startActivity(login);
+            Intent loading = new Intent(getApplicationContext(), LoadingActivity.class);
+            loading.putExtra("loginUser", new LoginModel(email.getText().toString(), password.getText().toString(), role));
+            startActivity(loading);
+        });
+        cancelButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
         });
     }
 }

@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.readysteady.R;
+import com.example.readysteady.models.LoginModel;
 
 public class LoadingActivity extends AppCompatActivity {
 
@@ -21,10 +23,28 @@ public class LoadingActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(LoadingActivity.this,MainActivity.class));
+                LoginModel loginModel = (LoginModel) getIntent().getSerializableExtra("loginUser");
+                String role = loginModel.getRole();
+                String email = loginModel.getUsername();
+                Intent login;
+                if (role.equals("driver")) {
+                    if (!email.equals("driver@gmail.com")){
+                        Toast.makeText(getApplicationContext(),"You username and password is not registered. Please register yourself", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    login = new Intent(getApplicationContext(), MapDriverActivity.class);
+                } else {
+                    if (!email.equals("rider@gmail.com")){
+                        Toast.makeText(getApplicationContext(),"You username and password is not registered. Please register yourself", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    login = new Intent(getApplicationContext(), MapRiderActivity.class);
+                }
+                login.putExtra("loginUser", loginModel);
+                startActivity(login);
                 finish();
             }
-        }, 4000);
+        }, 2000);
         ImageView img_ani = (ImageView) findViewById(R.id.cab);
 
         // New movement from left to right (fromXDelta = Start,toXDelta = end)
