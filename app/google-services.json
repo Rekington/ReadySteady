@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "769689114717",
+    "firebase_url": "https://readysteady-default-rtdb.firebaseio.com",
+    "project_id": "readysteady",
+    "storage_bucket": "readysteady.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:769689114717:android:176529c9fe97577373d5b4",
+        "android_client_info": {
+          "package_name": "com.example.readysteady"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "769689114717-0khem0n4oau1p2370ibflun469t3ugru.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.readysteady",
+            "certificate_hash": "d9873204c867e88de782f88cef3026fd698d7453"
+          }
+        },
+        {
+          "client_id": "769689114717-d392rs7q29e0rvl51msp9673rgsdtc22.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuLFdjAReeH_jLz5OMYKo9wEHCmxTk7UY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "769689114717-d392rs7q29e0rvl51msp9673rgsdtc22.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

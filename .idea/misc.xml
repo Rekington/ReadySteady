@@ -3,29 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_driver.xml" value="0.1793478260869565" />
-        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_driving.xml" value="0.2" />
-        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_loading.xml" value="0.17300724637681159" />
-        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_login.xml" value="0.17300724637681159" />
-        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_main.xml" value="0.4" />
-        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_passenger.xml" value="0.17300724637681159" />
-        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_rating.xml" value="0.17300724637681159" />
-        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_request.xml" value="0.1793478260869565" />
-        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_settings.xml" value="0.17300724637681159" />
-        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_signup.xml" value="0.17300724637681159" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_driver.xml" value="0.490036231884058" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_driving.xml" value="0.4661458333333333" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_loading.xml" value="0.490036231884058" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_login.xml" value="0.490036231884058" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_main.xml" value="0.490036231884058" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_menu.xml" value="0.490036231884058" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_passenger.xml" value="0.490036231884058" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_rating.xml" value="0.490036231884058" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_request.xml" value="0.490036231884058" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_settings.xml" value="0.490036231884058" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_signup.xml" value="0.4661458333333333" />
-        <entry key="..\:/Users/olive/AndroidStudioProjects/ReadySteady/app/src/main/res/layout/activity_waiting.xml" value="0.490036231884058" />
-        <entry key="..\:/Users/olive/Documents/GitHub/ReadySteady/app/src/main/res/layout/activity_main.xml" value="0.575" />
+        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_map_driver.xml" value="0.25416666666666665" />
+        <entry key="..\:/MSC/MobileNetwork/Project1/app/src/main/res/layout/activity_map_rider.xml" value="0.11614583333333334" />
       </map>
     </option>
   </component>
