@@ -108,6 +108,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
                 if(pickupMarker != null){
                     pickupMarker.remove();
                 }
+                requestForRide.setText("Call Transport");
 
 
             }else{

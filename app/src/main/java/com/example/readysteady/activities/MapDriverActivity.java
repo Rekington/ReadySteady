@@ -30,6 +30,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.example.readysteady.databinding.ActivityMapDriverBinding;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -95,7 +96,12 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
                         getCustomerAssignedPickupLocation();
                 }else{
                     customerID = "";
-
+                    if(pickupMarker!= null){
+                        pickupMarker.remove();
+                    }
+                    if(customerAssignedPickupLocationRefListener != null){
+                        customerAssignedPickupLocationRef.removeEventListener(customerAssignedPickupLocationRefListener);
+                    }
 
                 }
             }
@@ -107,12 +113,15 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
         });
     }
 
+    Marker pickupMarker;
+    private DatabaseReference customerAssignedPickupLocationRef;
+    private ValueEventListener customerAssignedPickupLocationRefListener;
     private void getCustomerAssignedPickupLocation(){
-        DatabaseReference customerAssignedPickupLocationRef = FirebaseDatabase.getInstance().getReference().child("riderRequest").child(customerID).child("l");
-        customerAssignedPickupLocationRef.addValueEventListener(new ValueEventListener() {
+        customerAssignedPickupLocationRef = FirebaseDatabase.getInstance().getReference().child("riderRequest").child(customerID).child("l");
+        customerAssignedPickupLocationRefListener = customerAssignedPickupLocationRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
+                if(snapshot.exists() && !customerID.equals("")){
                    List<Object> map = (List<Object>) snapshot.getValue();
                    double locationLat = 0;
                    double locationLng = 0;
