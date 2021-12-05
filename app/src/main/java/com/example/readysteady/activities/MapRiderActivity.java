@@ -112,9 +112,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
-        destinationLatLng = new LatLng(0.0,0.0);
-
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("riderRequest");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("AvailableRider");
         geoFire = new GeoFire(databaseReference);
         mapFragment.getMapAsync(this);
         logout.setOnClickListener(v -> {
@@ -131,8 +129,6 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
             }
             if (requestBol){
                 endRide();
-
-
             }else{
                 requestBol = true;
                 geoFire.setLocation(riderID, new GeoLocation(lastLocation.getLatitude(), lastLocation.getLongitude()));
@@ -152,8 +148,6 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
 
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
-        // Create a new PlacesClient instance
-        PlacesClient placesClient = Places.createClient(this);
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -173,7 +167,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
 
     }
 
-    private int radius = 1;
+    private int radius = 2;
     private Boolean driverFound = false;
     private String driverFoundID;
 
@@ -199,7 +193,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
                     map.put("destination", destination);
                     map.put("destinationLat", destinationLatLng.latitude);
                     map.put("destinationLng", destinationLatLng.longitude);
-                    //map.put("destinationLatLn", destinationLatLng);
+                    map.put("status", "requested");
 
                     driverRef.updateChildren(map);
 
@@ -240,7 +234,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
     private DatabaseReference driverLocationRef;
     private ValueEventListener driverLocationRefListener;
     private void getDriverLocation(){
-        DatabaseReference driverLocationRef = FirebaseDatabase.getInstance().getReference("AvailableDrivers").child(driverFoundID).child("l");
+        DatabaseReference driverLocationRef = FirebaseDatabase.getInstance().getReference("WorkingDrivers").child(driverFoundID).child("l");
         driverLocationRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -269,7 +263,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
 
                     float distance = location1.distanceTo(location2);
 
-                    if(distance<100){
+                    if(distance<200){
                         requestForRide.setText("Your driver has arrived!");
                     }else {
 
@@ -346,7 +340,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
         lastLocation = location;
         LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
         // save values
         String username = loginModel.getUsername();
         geoFire.setLocation(username.split("@")[0], new GeoLocation(location.getLatitude(), location.getLongitude()));
