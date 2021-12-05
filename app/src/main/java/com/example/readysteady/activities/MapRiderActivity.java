@@ -19,6 +19,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -111,6 +112,8 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
+        destinationLatLng = new LatLng(0.0,0.0);
+
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("riderRequest");
         geoFire = new GeoFire(databaseReference);
         mapFragment.getMapAsync(this);
@@ -127,23 +130,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
                 return;
             }
             if (requestBol){
-                requestBol = false;
-                geoQuery.removeAllListeners();
-                driverLocationRef.removeEventListener(driverLocationRefListener);
-
-                if (driverFoundID != null){
-                DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverFoundID);
-                driverRef.setValue(true);
-                driverFoundID = null;
-                }
-                driverFound = false;
-                radius = 1;
-                geoFire.removeLocation(riderID);
-
-                if(pickupMarker != null){
-                    pickupMarker.remove();
-                }
-                requestForRide.setText("Call Transport");
+                endRide();
 
 
             }else{
@@ -210,11 +197,14 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
                     HashMap map = new HashMap();
                     map.put("customerRideid", riderID);
                     map.put("destination", destination);
-                    map.put("destinationLatLn", destinationLatLng);
+                    map.put("destinationLat", destinationLatLng.latitude);
+                    map.put("destinationLng", destinationLatLng.longitude);
+                    //map.put("destinationLatLn", destinationLatLng);
 
                     driverRef.updateChildren(map);
 
                     getDriverLocation();
+                    getHasRideEnded();
                     requestForRide.setText("Currently Looking for Driver...");
                 }
             }
@@ -295,6 +285,49 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
 
             }
         });
+    }
+    private DatabaseReference driveHasEndedRef;
+    private ValueEventListener driveHasEndedRefListener;
+    private void getHasRideEnded(){
+        driveHasEndedRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverFoundID).child("customerRequest");
+        driveHasEndedRefListener = driveHasEndedRef.addValueEventListener(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+
+                }else{
+                    endRide();
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void endRide(){
+        requestBol = false;
+        geoQuery.removeAllListeners();
+        driverLocationRef.removeEventListener(driverLocationRefListener);
+        driveHasEndedRef.removeEventListener((driveHasEndedRefListener));
+
+        if (driverFoundID != null){
+            DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverFoundID);
+            driverRef.setValue(true);
+            driverFoundID = null;
+        }
+        driverFound = false;
+        radius = 1;
+        geoFire.removeLocation(riderID);
+
+        if(pickupMarker != null){
+            pickupMarker.remove();
+        }
+        requestForRide.setText("Call Transport");
     }
 
     @Override

@@ -1,43 +1,63 @@
 package com.example.readysteady.activities;
 
+
+import android.app.ProgressDialog;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
+import android.widget.ImageView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
-
 import android.nfc.Tag;
 import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.directions.route.AbstractRouting;
+import com.directions.route.Route;
+import com.directions.route.RouteException;
+import com.directions.route.Routing;
+import com.directions.route.RoutingListener;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.example.readysteady.R;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
 import com.example.readysteady.databinding.ActivityMapDriverBinding;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,9 +66,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.example.readysteady.models.LoginModel;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.List;
 
-public class MapDriverActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class MapDriverActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, RoutingListener {
 
     private GoogleMap mMap;
     private ActivityMapDriverBinding binding;
@@ -67,7 +90,10 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
     TextView name, phone, userLocation;
     ImageView profileImage;
 
-    private String customerID ="" ;
+    private int status = 0;
+
+    private String customerID ="", destination ;
+    private LatLng destinationLatLng;
 
     Marker pickupMarker;
     private DatabaseReference customerAssignedPickupLocationRef;
@@ -85,6 +111,26 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
         phone = findViewById(R.id.userPhone);
         userLocation = findViewById(R.id.userLocation);
         profileImage = findViewById(R.id.profileImage);
+
+        mRideStatus.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (status) {
+                case 1:
+                    status =2;
+                    removePolylines();
+                    if(destinationLatLng.latitude!=0.0 && destinationLatLng.longitude!=0.0) {
+                        getRouteToMarker(destinationLatLng);
+                    }
+                    mRideStatus.setText("Drive Complete!");
+                    break;
+                case 2:
+                    endRide();
+                    break;
+            }
+        }
+
+        });
 
         loginModel = (LoginModel) getIntent().getSerializableExtra("loginUser");
         driverID = loginModel.getUsername().split("@")[0];
@@ -128,18 +174,13 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
+                    status = 1;
                         customerID = "rider";
                         getCustomerAssignedPickupLocation();
                         getCustomerDetails(snapshot);
                 }else{
-                    customerID = "";
-                    if(pickupMarker!= null){
-                        pickupMarker.remove();
-                    }
-                    if(customerAssignedPickupLocationRefListener != null){
-                        customerAssignedPickupLocationRef.removeEventListener(customerAssignedPickupLocationRefListener);
-                    }
-                    mcustomerInfo.setVisibility(View.GONE);
+                endRide();
+
 
                 }
             }
@@ -167,6 +208,7 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
                     }
                     pickUpLocation = new LatLng(locationLat, locationLng);
                     mMap.addMarker(new MarkerOptions().position(pickUpLocation).title("Current Pickup Location").icon(MapRiderActivity.bitmapDescriptorFromVector(getApplicationContext(), R.mipmap.pickup)));
+                    getRouteToMarker(pickUpLocation);
                 }
             }
 
@@ -175,6 +217,70 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
 
             }
         });
+    }
+
+    private void getCustomerAssignedDestination(){
+        DatabaseReference assignedCustomerRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverID).child("customerRequests");
+        assignedCustomerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Map<String, Object> map = (Map<String, Object>) snapshot.getValue();
+                    if (map.get("destination") != null) {
+                        destination = map.get("destination").toString();
+                        mCustomerAssignedDestination.setText("Destination: " + destination);
+                    } else {
+                        mCustomerAssignedDestination.setText("Destination: No Selection");
+                    }
+
+                    Double destinationLat = 0.0;
+                    Double destinationLng = 0.0;
+                    if (map.get("destinationLat") != null) {
+                        destinationLat = Double.valueOf(map.get("destinationLat").toString());
+                    }
+                    if (map.get("destinationLng") != null) {
+                        destinationLng = Double.valueOf(map.get("destinationLng").toString());
+                        destinationLatLng = new LatLng(destinationLat, destinationLng);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getRouteToMarker(LatLng pickUpLocation) {
+        Routing routing = new Routing.Builder()
+                .travelMode(AbstractRouting.TravelMode.DRIVING)
+                .withListener(this)
+                .alternativeRoutes(false)
+                .waypoints(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), pickUpLocation)
+                .build();
+        routing.execute();
+    }
+
+    private void endRide(){
+        mRideStatus.setText("Picked up Customer");
+        removePolylines();
+
+        DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child("customerRequests");
+        driverRef.removeValue();
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("customerRequest");
+        GeoFire geoFire = new GeoFire(ref);
+        geoFire.removeLocation(customerID);
+        customerID="";
+
+        if (pickupMarker != null){
+            pickupMarker.remove();
+        }
+        if(customerAssignedPickupLocationRefListener != null){
+            customerAssignedPickupLocationRef.removeEventListener(customerAssignedPickupLocationRefListener);
+        }
+        mcustomerInfo.setVisibility(View.GONE);
     }
 
     @Override
@@ -259,5 +365,60 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
 
         GeoFire geoFire = new GeoFire(databaseReference);
         geoFire.removeLocation(username.split("@")[0]);
+    }
+    private List<Polyline> polylines;
+    private static final int[] COLORS = new int[]{R.color.primary_dark_material_light};
+
+    @Override
+    public void onRoutingFailure(RouteException e) {
+        if(e != null) {
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }else {
+            Toast.makeText(this, "Something went wrong, Try again", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRoutingStart() {
+
+    }
+
+    @Override
+    public void onRoutingSuccess(ArrayList<Route> route, int shortestRouteIndex) {
+        if(polylines.size()>0) {
+            for (Polyline poly : polylines) {
+                poly.remove();
+            }
+        }
+
+        polylines = new ArrayList<>();
+        //add route(s) to the map.
+        for (int i = 0; i <route.size(); i++) {
+
+            //In case of more than 5 alternative routes
+            int colorIndex = i % COLORS.length;
+
+            PolylineOptions polyOptions = new PolylineOptions();
+            polyOptions.color(getResources().getColor(COLORS[colorIndex]));
+            polyOptions.width(10 + i * 3);
+            polyOptions.addAll(route.get(i).getPoints());
+            Polyline polyline = mMap.addPolyline(polyOptions);
+            polylines.add(polyline);
+
+            Toast.makeText(getApplicationContext(),"Route "+ (i+1) +": distance - "+ route.get(i).getDistanceValue()+": duration - "+ route.get(i).getDurationValue(),Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    public void onRoutingCancelled() {
+
+    }
+
+    private void removePolylines() {
+        for (Polyline line : polylines) {
+            line.remove();
+        }
+        polylines.clear();
     }
 }
