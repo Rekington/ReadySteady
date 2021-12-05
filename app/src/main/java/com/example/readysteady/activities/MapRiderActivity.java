@@ -194,10 +194,10 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
                     map.put("destinationLat", destinationLatLng.latitude);
                     map.put("destinationLng", destinationLatLng.longitude);
                     map.put("status", "requested");
-
                     driverRef.updateChildren(map);
 
                     getDriverLocation();
+                    updateStatus();
                     getHasRideEnded();
                     requestForRide.setText("Currently Looking for Driver...");
                 }
@@ -225,6 +225,41 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void updateStatus() {
+
+        DatabaseReference driverLocationRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child("driver").child("customerRequest").child("status");;
+        driverLocationRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    String status = snapshot.getValue().toString();
+                    switch (status){
+                        case "Accepted":
+                            Toast.makeText(getApplicationContext(), "Driver has accepted your ride.", Toast.LENGTH_LONG).show();
+                            break;
+                        case "DriverOnWay":
+                            Toast.makeText(getApplicationContext(), "Driver is coming to pick you.", Toast.LENGTH_LONG).show();
+                            break;
+                        case "EnrouteToDestination":
+                            requestForRide.setText("On the way to destination");
+                            requestForRide.setEnabled(false);
+                            break;
+                        case "Reached":
+                            Toast.makeText(getApplicationContext(), "You have arrived on your destination", Toast.LENGTH_LONG).show();
+                            requestForRide.setEnabled(true);
+                            requestForRide.setText("Request For Ride");
+                            break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });

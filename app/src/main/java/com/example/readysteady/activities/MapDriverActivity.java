@@ -104,11 +104,13 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
         mRideStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DatabaseReference customerAssignedRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverID).child("customerRequest").child("status");
                 switch (status) {
                     case 0:
                         status = 1;
                         customerID = "rider";
                         mRideStatus.setText("Get to Pickup");
+                        customerAssignedRef.setValue("Accepted");
                         break;
                     case 1:
                         status = 2;
@@ -118,29 +120,24 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
                         DatabaseReference databaseRefWorking = FirebaseDatabase.getInstance().getReference("WorkingDrivers");
                         GeoFire geoFireAvailable = new GeoFire(databaseRefAvailable);
                         GeoFire geoFireWorking = new GeoFire(databaseRefWorking);
-                        switch (customerID) {
-                            case "rider":
-                                if (pickUpLatLng != null) {
-                                    geoFireAvailable.removeLocation(driverID);
-                                    geoFireWorking.setLocation(driverID, new GeoLocation(pickUpLatLng.latitude, pickUpLatLng.longitude));
-                                    mMap.addMarker(new MarkerOptions().position(pickUpLatLng).title("Current Pickup Location").icon(MapRiderActivity.bitmapDescriptorFromVector(getApplicationContext(), R.mipmap.pickup)));
-                                }
-                                break;
-                            default:
-                                geoFireWorking.removeLocation(driverID);
-                                geoFireAvailable.setLocation(driverID, new GeoLocation(lastLocation.getLatitude(), lastLocation.getLongitude()));
-                                break;
+                        if (pickUpLatLng != null) {
+                            geoFireAvailable.removeLocation(driverID);
+                            geoFireWorking.setLocation(driverID, new GeoLocation(pickUpLatLng.latitude, pickUpLatLng.longitude));
+                            mMap.addMarker(new MarkerOptions().position(pickUpLatLng).title("Current Pickup Location").icon(MapRiderActivity.bitmapDescriptorFromVector(getApplicationContext(), R.mipmap.pickup)));
                         }
+                        customerAssignedRef.setValue("DriverOnWay");
                         mRideStatus.setText("Start Ride");
                         break;
                     case 2:
                         status = 3;
+                        customerAssignedRef.setValue("EnrouteToDestination");
                         mRideStatus.setText("Finish ride");
                         getRouteToMarker(destinationLatLng);
                         removePolylines();
                         break;
                     case 3:
                         endRide();
+                        customerAssignedRef.setValue("Reached");
                         mRideStatus.setText("Pick-up Customer?");
                         break;
                 }
@@ -189,7 +186,8 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    getCustomerDetails(snapshot);
+                    if(snapshot.child("status").equals("requested"))
+                        getCustomerDetails(snapshot);
                 } else {
                     endRide();
                 }
