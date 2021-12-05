@@ -77,6 +77,9 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
     String riderID;
     String driverId = "driver";
     String destination;
+    LatLng destinationLatLng;
+
+
     private Boolean requestBol = false;
     private Marker pickupMarker;
     private static int AUTOCOMPLETE_REQUEST_CODE = 1;
@@ -153,7 +156,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
         Places.initialize(getApplicationContext(), apiKey);
 
         // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
         // Create a new PlacesClient instance
         PlacesClient placesClient = Places.createClient(this);
         // Set up a PlaceSelectionListener to handle the response.
@@ -162,6 +165,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
                 destination = place.getName();
+                destinationLatLng = place.getLatLng();
             }
 
 
@@ -198,6 +202,8 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
                     HashMap map = new HashMap();
                     map.put("customerRideid", riderID);
                     map.put("destination", destination);
+                    map.put("destinationLatLn", destinationLatLng);
+
                     driverRef.updateChildren(map);
 
                     getDriverLocation();
