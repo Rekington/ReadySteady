@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.readysteady.R;
 import com.example.readysteady.databinding.ActivityMapRiderBinding;
@@ -102,6 +103,10 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
         loginModel = (LoginModel) getIntent().getSerializableExtra("loginUser");
         riderID = loginModel.getUsername().split("@")[0];
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment.setHint("Search Destination");
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -117,6 +122,10 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
         });
 
         requestForRide.setOnClickListener(v -> {
+            if (destination == null || destination.isEmpty()){
+                Toast.makeText(getApplicationContext(), "Please select destination.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (requestBol){
                 requestBol = false;
                 geoQuery.removeAllListeners();
@@ -151,8 +160,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
 
 
         // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
         Places.initialize(getApplicationContext(), apiKey);
 
         // Specify the types of place data to return.
