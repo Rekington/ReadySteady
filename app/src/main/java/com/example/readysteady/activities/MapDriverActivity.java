@@ -11,8 +11,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -53,6 +55,7 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
     GoogleApiClient googleApiClient;
     Location lastLocation;
     LatLng pickUpLocation;
+    LatLng destinationLatlng;
     FusedLocationProviderClient mFusedLocationClient;
     LocationRequest locationRequest;
     LoginModel loginModel;
@@ -110,7 +113,10 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
         name.setText("Test User");
         phone.setText("07742700000");
         if(dataSnapshot.child("destination").exists() ){
+            DataSnapshot dest = dataSnapshot.child("destination");
             userLocation.setText(dataSnapshot.child("destination").getValue().toString());
+            destinationLatlng = new LatLng(Double.parseDouble(dataSnapshot.child("destinationLatLn").child("latitude").getValue().toString()),Double.parseDouble(dataSnapshot.child("destinationLatLn").child("longitude").getValue().toString()));
+            Log.println(Log.INFO,"LOG:","Destination LatLng "+ destinationLatlng);
         }
 
     }
