@@ -14,14 +14,16 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+
 import android.widget.Button;
 
 import com.example.readysteady.R;
 import com.example.readysteady.databinding.ActivityMapRiderBinding;
+
 import com.example.readysteady.models.LoginModel;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -77,6 +79,13 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
     String destination;
     private Boolean requestBol = false;
     private Marker pickupMarker;
+    private static int AUTOCOMPLETE_REQUEST_CODE = 1;
+    String apiKey;
+
+    // Set the fields to specify which types of place data to
+    // return after the user has made a selection.
+    List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +95,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
         setContentView(binding.getRoot());
         logout = findViewById(R.id.logout);
         requestForRide = findViewById(R.id.request);
+        apiKey = getString(R.string.api_key);
         loginModel = (LoginModel) getIntent().getSerializableExtra("loginUser");
         riderID = loginModel.getUsername().split("@")[0];
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -140,7 +150,7 @@ public class MapRiderActivity extends FragmentActivity implements OnMapReadyCall
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        Places.initialize(getApplicationContext(), "AIzaSyDlPk93cKIJ-cPyzrCea717J-TP5J7AH04");
+        Places.initialize(getApplicationContext(), apiKey);
 
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));

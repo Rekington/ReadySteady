@@ -45,7 +45,6 @@ import com.example.readysteady.models.LoginModel;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
-import java.util.Objects;
 
 public class MapDriverActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -105,16 +104,21 @@ public class MapDriverActivity extends FragmentActivity implements OnMapReadyCal
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void getCustomerDetails(DataSnapshot dataSnapshot){
         mcustomerInfo.setVisibility(View.VISIBLE);
         name.setText("Test User");
         phone.setText("07742700000");
-        userLocation.setText(Objects.requireNonNull(dataSnapshot.getValue()).toString());
+        if(dataSnapshot.child("destination").exists() ){
+            userLocation.setText(dataSnapshot.child("destination").getValue().toString());
+        }
+
     }
 
     private void getAssignedCustomer(){
         DatabaseReference customerAssignedRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(driverID).child("customerRequest");
         customerAssignedRef.addValueEventListener(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){

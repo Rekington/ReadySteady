@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">ReadySteady</string>
     <string name="title_activity_map_driver">MapDriverActivity</string>
+    <string name="api_key">AIzaSyDlPk93cKIJ-cPyzrCea717J-TP5J7AH04</string>
 </resources>
